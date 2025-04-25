@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template
 import numpy as np
-import pandas as pd
 import joblib
 
 # Load saved models
@@ -9,19 +8,15 @@ pca = joblib.load("pca.joblib")
 gmm_model = joblib.load("gmm_model.joblib")
 label_map = joblib.load("gmm_label_map.joblib")
 
-# Create Flask app
 app = Flask(__name__)
 
-# Home route
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html', prediction=None)
 
-# Prediction route
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # Get form data
         features = [
             int(request.form['Unnamed: 0']),
             int(request.form['Age']),
@@ -38,12 +33,10 @@ def predict():
         credit_dur_ratio = features[8] / (features[6] + 1)
         features.append(credit_dur_ratio)
 
-        # Preprocess
         input_scaled = scaler.transform([features])
         input_pca = pca.transform(input_scaled)
         pred_cluster = gmm_model.predict(input_pca)[0]
 
-        # Map to label (Good/Bad Credit)
         mapped_label = label_map[pred_cluster]
         result = "Bad Credit" if mapped_label == 1 else "Good Credit"
 
@@ -52,5 +45,5 @@ def predict():
     except Exception as e:
         return f"Prediction Error: {str(e)}"
 
-if __name__ == '__main__':
+if __name__ == '_main_':
     app.run(debug=True)
