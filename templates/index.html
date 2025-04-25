@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Credit Risk Prediction</title>
+</head>
+<body>
+    <h2>German Credit Risk Prediction</h2>
+    <form method="POST" action="/predict">
+        Unnamed: 0: <input type="number" name="Unnamed: 0"><br><br>
+        Age: <input type="number" name="Age"><br><br>
+        Job: <input type="number" name="Job"><br><br>
+        Sex (encoded): <input type="number" name="Sex"><br><br>
+        Housing (encoded): <input type="number" name="Housing"><br><br>
+        Saving Accounts (encoded): <input type="number" name="Saving_accounts"><br><br>
+        Checking Account (encoded): <input type="number" name="Checking_account"><br><br>
+        Duration: <input type="number" name="Duration"><br><br>
+        Purpose (encoded): <input type="number" name="Purpose"><br><br>
+        Credit Amount: <input type="number" name="Credit_amount"><br><br>
+
+        <input type="submit" value="Predict">
+    </form>
+
+    {% if prediction %}
+        <h3>Prediction: {{ prediction }}</h3>
+    {% endif %}
+</body>
+</html>
