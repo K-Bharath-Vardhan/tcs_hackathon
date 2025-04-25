@@ -1,27 +1,167 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Credit Risk Prediction</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #e0eafc, #cfdef3);
+            margin: 0;
+            padding: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: auto;
+            gap: 40px;
+        }
+
+        .form-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 45%;
+        }
+
+        form input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        form input[type="submit"] {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .graph-container {
+            width: 50%;
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h3 {
+            text-align: center;
+            color: #444;
+            margin-top: 20px;
+        }
+
+        #creditRiskChart {
+            max-width: 500px;
+            height: 500px;
+            margin: auto;
+        }
+    </style>
 </head>
 <body>
+
     <h2>German Credit Risk Prediction</h2>
-    <form method="POST" action="/predict">
-        Unnamed: 0: <input type="number" name="Unnamed: 0"><br><br>
-        Age: <input type="number" name="Age"><br><br>
-        Job: <input type="number" name="Job"><br><br>
-        Sex (encoded): <input type="number" name="Sex"><br><br>
-        Housing (encoded): <input type="number" name="Housing"><br><br>
-        Saving Accounts (encoded): <input type="number" name="Saving_accounts"><br><br>
-        Checking Account (encoded): <input type="number" name="Checking_account"><br><br>
-        Duration: <input type="number" name="Duration"><br><br>
-        Purpose (encoded): <input type="number" name="Purpose"><br><br>
-        Credit Amount: <input type="number" name="Credit_amount"><br><br>
+    <div class="container">
+        <div class="form-container">
+            <form method="POST" action="/predict">
+                Unnamed: 0: <input type="number" name="Unnamed: 0"><br>
+                Age: <input type="number" name="Age"><br>
+                Job: <input type="number" name="Job"><br>
+                Sex (encoded): <input type="number" name="Sex"><br>
+                Housing (encoded): <input type="number" name="Housing"><br>
+                Saving Accounts (encoded): <input type="number" name="Saving_accounts"><br>
+                Checking Account (encoded): <input type="number" name="Checking_account"><br>
+                Duration: <input type="number" name="Duration"><br>
+                Purpose (encoded): <input type="number" name="Purpose"><br>
+                Credit Amount: <input type="number" name="Credit_amount"><br><br>
 
-        <input type="submit" value="Predict">
-    </form>
+                <input type="submit" value="Predict">
+            </form>
 
-    {% if prediction %}
-        <h3>Prediction: {{ prediction }}</h3>
-    {% endif %}
+            {% if prediction %}
+                <h3>Prediction: {{ prediction }}</h3>
+            {% endif %}
+        </div>
+
+        <div class="graph-container">
+            <canvas id="creditRiskChart"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('creditRiskChart').getContext('2d');
+        const prediction = "{{ prediction | default('') }}";
+
+        let chartColor, chartLabel;
+
+        if (prediction === "Good Credit") {
+            chartColor = "#A6E6B2";  // Softer green
+            chartLabel = "Good Credit (100%)";
+        } else if (prediction === "Bad Credit") {
+            chartColor = "#FF9999";  // Softer red
+            chartLabel = "Bad Credit (100%)";
+        } else {
+            chartColor = "#C0C0C0";  // Silver
+            chartLabel = "No Prediction";
+        }
+
+        const data = {
+            labels: [chartLabel],
+            datasets: [{
+                label: 'Credit Risk',
+                data: [1],
+                backgroundColor: [chartColor],
+                borderWidth: 0
+            }]
+        };
+
+        const config = {
+            type: 'doughnut',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Credit Risk Result'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return chartLabel;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                }
+            }
+        };
+
+        new Chart(ctx, config);
+    </script>
 </body>
 </html>
